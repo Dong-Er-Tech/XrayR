@@ -252,6 +252,7 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 		}
 
 		if users[i].DeviceLimit > 0 {
+			log.Printf("GetUserList Device limit (%d): %d", users[i].Id, users[i].DeviceLimit)
 			u.DeviceLimit = users[i].DeviceLimit
 		} else {
 			u.DeviceLimit = c.DeviceLimit
