@@ -20,6 +20,7 @@ import (
 	"golang.org/x/time/rate"
 
 	"github.com/XrayR-project/XrayR/api"
+	log "github.com/sirupsen/logrus"
 )
 
 type UserInfo struct {
@@ -247,6 +248,12 @@ func globalLimit(inboundInfo *InboundInfo, email string, uid int, ip string, dev
 	ipMap := v.(*map[string]int)
 	// Reject device reach limit directly
 	if deviceLimit > 0 && len(*ipMap) > deviceLimit {
+		ipMapaaa := *ipMap
+		var entries []string
+		for k, v := range ipMapaaa {
+			entries = append(entries, fmt.Sprintf("%s:%d", k, v))
+		}
+		log.Printf("TESTBD Device limit reached  deviceLimit (%d) len(*ipMap) %d listofip: %s", deviceLimit, len(*ipMap) , strings.Join(entries, ", "))
 		return true
 	}
 
