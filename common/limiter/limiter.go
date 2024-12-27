@@ -178,7 +178,7 @@ func (l *Limiter) GetUserBucket(tag string, email string, ip string) (limiter *r
 			userLimit = u.SpeedLimit
 			deviceLimit = u.DeviceLimit
 		}
-
+		log.Printf("TESTBD   aftr user load deviceLimit: %d email: %s",deviceLimit, email)
 		// Local device limit
 		ipMap := new(sync.Map)
 		ipMap.Store(ip, uid)
@@ -198,7 +198,7 @@ func (l *Limiter) GetUserBucket(tag string, email string, ip string) (limiter *r
 				}
 			}
 		}
-
+		log.Printf("TESTBD enter globallimit prior globallimit %s",email)
 		// GlobalLimit
 		if inboundInfo.GlobalLimit.config != nil && inboundInfo.GlobalLimit.config.Enable {
 			if reject := globalLimit(inboundInfo, email, uid, ip, deviceLimit); reject {
@@ -227,7 +227,7 @@ func (l *Limiter) GetUserBucket(tag string, email string, ip string) (limiter *r
 
 // Global device limit
 func globalLimit(inboundInfo *InboundInfo, email string, uid int, ip string, deviceLimit int) bool {
-
+	log.Printf("TESTBD enter globallimit email %s",email)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(inboundInfo.GlobalLimit.config.Timeout)*time.Second)
 	defer cancel()
 
@@ -246,14 +246,15 @@ func globalLimit(inboundInfo *InboundInfo, email string, uid int, ip string, dev
 	}
 
 	ipMap := v.(*map[string]int)
+	ipMapaaa := *ipMap
+	var entries []string
+	for k, v := range ipMapaaa {
+		entries = append(entries, fmt.Sprintf("%s:%d", k, v))
+	}
+	log.Printf("TESTBD deviceLimit %d", deviceLimit)
+	log.Printf("TESTBD listofip: %s", strings.Join(entries, ", "))
 	// Reject device reach limit directly
 	if deviceLimit > 0 && len(*ipMap) > deviceLimit {
-		ipMapaaa := *ipMap
-		var entries []string
-		for k, v := range ipMapaaa {
-			entries = append(entries, fmt.Sprintf("%s:%d", k, v))
-		}
-		log.Printf("TESTBD Device limit reached  deviceLimit (%d) len(*ipMap) %d listofip: %s", deviceLimit, len(*ipMap) , strings.Join(entries, ", "))
 		return true
 	}
 
