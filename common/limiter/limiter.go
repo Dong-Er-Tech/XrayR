@@ -20,6 +20,7 @@ import (
 	"golang.org/x/time/rate"
 
 	"github.com/XrayR-project/XrayR/api"
+	log "github.com/sirupsen/logrus"
 )
 
 type UserInfo struct {
@@ -245,10 +246,19 @@ func globalLimit(inboundInfo *InboundInfo, email string, uid int, ip string, dev
 	}
 
 	ipMap := v.(*map[string]int)
+	ipMapped := *ipMap
+	var entries []string
+	for k, v := range ipMapped {
+		entries = append(entries, fmt.Sprintf("%s:%d", k, v))
+	}
+	log.Printf("Setting: [Limit: %d] [Current Length: %d] [IP List: %s]", deviceLimit, len(*ipMap) , strings.Join(entries, ", "))
+
 	// Reject device reach limit directly
 	if deviceLimit > 0 && len(*ipMap) > deviceLimit {
+		log.Printf("Limit hit, rejecting the following IP: %s", ip)
 		return true
 	}
+	
 
 	// If the ip is not in cache
 	if _, ok := (*ipMap)[ip]; !ok {
