@@ -17,6 +17,7 @@ import (
 
 	"github.com/XrayR-project/XrayR/api"
 	"github.com/XrayR-project/XrayR/common/mylego"
+	log "github.com/sirupsen/logrus"
 )
 
 // InboundBuilder build Inbound config for different protocol
@@ -207,11 +208,14 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 		streamSetting.SplitHTTPSettings = splithttpSetting
 	}
 	streamSetting.Network = &transportProtocol
-
+	log.Printf("before config.DisableLocalREALITYConfig")
 	// Build TLS and REALITY settings
 	var isREALITY bool
 	if config.DisableLocalREALITYConfig {
+		log.Printf("in config.DisableLocalREALITYConfig")
+		
 		if nodeInfo.REALITYConfig != nil && nodeInfo.EnableREALITY {
+			log.Printf("in nodeInfo.REALITYConfig != nil && nodeInfo.EnableREALITY")
 			isREALITY = true
 			streamSetting.Security = "reality"
 
